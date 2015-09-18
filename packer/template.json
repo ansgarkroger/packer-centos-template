@@ -1,0 +1,118 @@
+{
+    "push": {
+      "name": "{{user `atlas_username`}}/{{user `atlas_name`}}",
+      "token": "{{user `atlas_token`}}",
+      "vcs": true
+    },
+  "builders": [
+    {
+      "boot_command": [
+        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort}}/ks6.cfg<enter>"
+      ],
+      "type": "virtualbox-iso",
+      "vm_name": "centos65",
+      "disk_size": 65536,
+      "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
+      "guest_os_type": "RedHat_64",
+      "hard_drive_interface": "sata",
+      "headless": "{{ user `headless` }}",
+      "iso_checksum": "{{ user `iso_checksum` }}",
+      "iso_checksum_type": "sha1",
+      "http_directory": "http",
+      "iso_urls": [
+        "{{ user `iso_path` }}/{{ user `iso_name` }}",
+        "{{ user `iso_url` }}"
+      ],
+      "ssh_password": "{{ user `ssh_password` }}",
+      "ssh_username": "{{ user `ssh_username` }}",
+      "ssh_wait_timeout": "10000s",
+      "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
+      "virtualbox_version_file": ".vbox_version",
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "512"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "1"
+        ]
+      ]
+    }
+  ],
+  "post-processors": [
+    {
+      "keep_input_artifact": false,
+      "output": "box/{{.Provider}}/centos65-{{user `cm`}}{{user `cm_version`}}-{{user `version`}}.box",
+      "type": "vagrant"
+    },
+        {
+            "type": "atlas",
+            "only": ["virtualbox-iso"],
+            "artifact": "{{user `atlas_username`}}/{{user `atlas_name`}}",
+            "artifact_type": "vagrant.box",
+            "metadata": {
+                "provider": "virtualbox",
+                "version": "0.0.1"
+            }
+        }
+  ],
+  "provisioners": [
+    {
+      "environment_vars": [
+        "CM={{user `cm`}}",
+        "CM_VERSION={{user `cm_version`}}",
+        "CLEANUP_PAUSE={{user `cleanup_pause`}}",
+        "UPDATE={{user `update`}}",
+        "INSTALL_VAGRANT_KEY={{user `install_vagrant_key`}}",
+        "SSH_USERNAME={{user `ssh_username`}}",
+        "SSH_PASSWORD={{user `ssh_password`}}",
+        "http_proxy={{user `http_proxy`}}",
+        "https_proxy={{user `https_proxy`}}",
+        "ftp_proxy={{user `ftp_proxy`}}",
+        "rsync_proxy={{user `rsync_proxy`}}",
+        "no_proxy={{user `no_proxy`}}",
+        "ATLAS_USERNAME={{user `atlas_username`}}",
+        "ATLAS_NAME={{user `atlas_name`}}",
+        "ATLAS_TOKEN={{user `atlas_token`}}"
+      ],
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -E -S bash '{{.Path}}'",
+      "scripts": [
+        "script/fix-slow-dns.sh",
+        "script/sshd.sh",
+        "script/update.sh",
+        "script/vagrant.sh",
+        "script/cmtool.sh",
+        "script/cleanup.sh"
+      ],
+      "type": "shell"
+    }
+  ],
+  "variables": {
+    "cleanup_pause": "",
+    "cm": "chef",
+    "cm_version": "",
+    "ftp_proxy": "{{env `ftp_proxy`}}",
+    "headless": "true",
+    "http_proxy": "{{env `http_proxy`}}",
+    "https_proxy": "{{env `https_proxy`}}",
+    "install_vagrant_key": "true",
+    "iso_checksum": "0d9dc37b5dd4befa1c440d2174e88a87",
+    "iso_name": "CentOS-6.5-x86_64-bin-DVD1.iso",
+    "iso_path": "iso",
+    "iso_url": "http://archive.kernel.org/centos-vault/6.5/isos/x86_64/CentOS-6.5-x86_64-minimal.iso",
+    "no_proxy": "{{env `no_proxy`}}",
+    "rsync_proxy": "{{env `rsync_proxy`}}",
+    "ssh_password": "vagrant",
+    "ssh_username": "vagrant",
+    "update": "false",
+    "version": "0.1.0",
+    "atlas_username": "ansgar",
+    "atlas_name": "centos-wf",
+    "atlas_token": "uX0fiQB2bYyS4Q.atlasv1.Vt69xrnz7sogmMjkSZClY6LG9NyKw1UE9zn1ahr2Yd9zRRZyV9fFLzDJpWurBNsys6c"
+  }
+}
