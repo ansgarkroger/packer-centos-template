@@ -86,41 +86,40 @@
         "script/sshd.sh",
         "script/update.sh",
         "script/vagrant.sh",
-        "script/cmtool.sh",
-        "script/cleanup.sh"
+        "script/cmtool.sh"
       ],
       "type": "shell"
     },
     {
       "type": "shell",
       "inline": [
-        "sudo mkdir -p /etc/chef && sudo chown -R root:root /etc/chef",
-        "sudo mkdir -p /tmp/packer-chef-client && sudo chown -R root:root /tmp/packer-chef-client"
+        "sudo mkdir -p /etc/chef && sudo chown -R vagrant:vagrant /etc/chef",
+        "sudo mkdir -p /tmp/packer-chef-client && sudo chown -R vagrant:vagrant /tmp/packer-chef-client"
       ]
     },
 
     {
       "type": "file",
       "source": "{{pwd}}/cookbooks",
-      "destination": "/etc/chef/cookbooks"
+      "destination": "/etc/chef"
     },
 
     {
       "type": "file",
-      "source": "{{pwd}}/data_bags",
-      "destination": "/etc/chef/databags"
+      "source": "{{pwd}}/databags",
+      "destination": "/etc/chef"
     },
 
     {
       "type": "file",
       "source": "{{pwd}}/environments",
-      "destination": "/etc/chef/environments"
+      "destination": "/etc/chef"
     },
 
     {
       "type": "file",
       "source": "{{pwd}}/encrypted_data_bag_secret",
-      "destination": "/etc/chef/encrypted_data_bag_secret"
+      "destination": "/etc/chef"
     },
 
     {
@@ -133,7 +132,31 @@
       "run_list": [
         "wildfly::default"
       ]
-    }
+    },
+    {
+      "environment_vars": [
+        "CM={{user `cm`}}",
+        "CM_VERSION={{user `cm_version`}}",
+        "CLEANUP_PAUSE={{user `cleanup_pause`}}",
+        "UPDATE={{user `update`}}",
+        "INSTALL_VAGRANT_KEY={{user `install_vagrant_key`}}",
+        "SSH_USERNAME={{user `ssh_username`}}",
+        "SSH_PASSWORD={{user `ssh_password`}}",
+        "http_proxy={{user `http_proxy`}}",
+        "https_proxy={{user `https_proxy`}}",
+        "ftp_proxy={{user `ftp_proxy`}}",
+        "rsync_proxy={{user `rsync_proxy`}}",
+        "no_proxy={{user `no_proxy`}}",
+        "ATLAS_USERNAME={{user `atlas_username`}}",
+        "ATLAS_NAME={{user `atlas_name`}}",
+        "ATLAS_TOKEN={{user `atlas_token`}}"
+      ],
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -E -S bash '{{.Path}}'",
+      "scripts": [
+        "script/cleanup.sh"
+      ],
+      "type": "shell"
+    },
   ],
   "variables": {
     "cleanup_pause": "",
