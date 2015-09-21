@@ -90,6 +90,49 @@
         "script/cleanup.sh"
       ],
       "type": "shell"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo mkdir -p /etc/chef && sudo chown -R root:root /etc/chef",
+        "sudo mkdir -p /tmp/packer-chef-client && sudo chown -R root:root /tmp/packer-chef-client"
+      ]
+    },
+
+    {
+      "type": "file",
+      "source": "{{pwd}}/cookbooks",
+      "destination": "/etc/chef/cookbooks"
+    },
+
+    {
+      "type": "file",
+      "source": "{{pwd}}/data_bags",
+      "destination": "/etc/chef/databags"
+    },
+
+    {
+      "type": "file",
+      "source": "{{pwd}}/environments",
+      "destination": "/etc/chef/environments"
+    },
+
+    {
+      "type": "file",
+      "source": "{{pwd}}/encrypted_data_bag_secret",
+      "destination": "/etc/chef/encrypted_data_bag_secret"
+    },
+
+    {
+      "type": "chef-client",
+      "execute_command": "cd /etc/chef && sudo chef-client --local-mode --no-color -c /tmp/packer-chef-client/client.rb -j /tmp/packer-chef-client/first-boot.json",
+      "chef_environment": "packer",
+      "server_url": "http://localhost:8889",
+      "skip_clean_node": "true",
+      "skip_clean_client": "true",
+      "run_list": [
+        "wildfly::default"
+      ]
     }
   ],
   "variables": {
@@ -97,7 +140,7 @@
     "cm": "chef",
     "cm_version": "",
     "ftp_proxy": "{{env `ftp_proxy`}}",
-    "headless": "true",
+    "headless": "false",
     "http_proxy": "{{env `http_proxy`}}",
     "https_proxy": "{{env `https_proxy`}}",
     "install_vagrant_key": "true",
