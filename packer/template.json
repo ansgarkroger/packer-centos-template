@@ -85,51 +85,26 @@
         "script/fix-slow-dns.sh",
         "script/sshd.sh",
         "script/update.sh",
-        "script/vagrant.sh",
-        "script/cmtool.sh"
+        "script/vagrant.sh"
       ],
       "type": "shell"
     },
     {
       "type": "shell",
       "inline": [
-        "sudo mkdir -p /etc/chef && sudo chown -R vagrant:vagrant /etc/chef",
-        "sudo mkdir -p /tmp/packer-chef-client && sudo chown -R vagrant:vagrant /tmp/packer-chef-client"
+        "sudo mkdir -p /tmp/packer-chef-solo && sudo chown -R vagrant:vagrant /tmp/packer-chef-solo"
       ]
     },
 
     {
-      "type": "file",
-      "source": "{{pwd}}/cookbooks",
-      "destination": "/etc/chef"
-    },
-
-    {
-      "type": "file",
-      "source": "{{pwd}}/databags",
-      "destination": "/etc/chef"
-    },
-
-    {
-      "type": "file",
-      "source": "{{pwd}}/environments",
-      "destination": "/etc/chef"
-    },
-
-    {
-      "type": "file",
-      "source": "{{pwd}}/encrypted_data_bag_secret",
-      "destination": "/etc/chef"
-    },
-
-    {
-      "type": "chef-client",
-      "execute_command": "cd /etc/chef && sudo chef-client --local-mode --no-color -c /tmp/packer-chef-client/client.rb -j /tmp/packer-chef-client/first-boot.json",
+      "type": "chef-solo",
+      "cookbook_paths": ["cookbooks"],
+      "data_bags_path": "databags",
+      "encrypted_data_bag_secret_path": "encrypted_data_bag_secret",
+      "environments_path": "environments",
       "chef_environment": "packer",
-      "skip_clean_node": "true",
-      "skip_clean_client": "true",
       "run_list": [
-        
+        "wildfly:default"
       ]
     }
   ],
