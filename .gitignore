@@ -1,3 +1,5 @@
 build/vagrant-boxes/*.box
 output-virtualbox/
 packer_cache/
+.project
+packer/output-virtualbox-iso/
